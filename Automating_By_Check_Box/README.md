@@ -1,10 +1,11 @@
+# Automating_By_Check_Box Program Overview
 The program starts out by declaring numerous variables related to BSD's API call, and VAN's API calls. These include API usernames, secrets, and various element that allow the URL to be built. In the case of BSD’s URL, It dynamically adds in a parameter, the signup form ID, which is why the program requires input. Two VAN API will be called, with both using POST requests. The second API requires a URL that has a VAN ID in it, thus there is a function that is called to dynamically add this, and this does not require user input. BSD’s API’s use HMAC authentication and VAN’s use general authentication, though it is sent via a URL that uses HTTPS encryption.
 
 A PANDAS DataFrame is also created so that the program can output a log of everyone affected to a CSV file
 
 The main part of the program begins when the BSD API is called, and XML data is then returned and read, and parsed into JSON using the yahoo standard. 
 
-Everything beyond this point, uses threading to run concurrently:
+### Everything beyond this point, uses threading to run concurrently:
 
 At this point, a previously declared queue (which is the size of the number of AC/SV lists in use) is referenced, and a global constant variable that defines the number of threads that will operate on this first queue is also referenced. There is a threading lock in place, otherwise around 20 threads will run concurrently, this this first Queue will soon reference another queue. Do not remove this, ONLY remove it if the computer being used is sufficiently powerful, such that it is 64 bit, quad-core, and each core is running at least above 2 ghz). 
 
