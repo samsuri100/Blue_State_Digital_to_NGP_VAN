@@ -1,5 +1,5 @@
 # XML_To_JSON_API_Automation
-This repositoary contains two different programs that were developed for Battleground Texas (BGTX), a non-profit organization in Austin, Texas: Automating_All_Users Program and Automating_By_Check_Box Program. Each transforms XML data into JSON and both make API calls to two different political data organizations, Blue State Digital (BSD) and NGP VAN (VAN). 
+This repository contains two different programs that were developed for Battleground Texas (BGTX), a non-profit organization in Austin, Texas: Automating_All_Users Program and Automating_By_Check_Box Program. Each transforms XML data into JSON and both make API calls to two different political data organizations, Blue State Digital (BSD) and NGP VAN (VAN). 
 
 ## Automating_All_Users Program
 The Automating_All_Users program retrieves XML form data from BSD for BGTX's signup form #275, parses it into JSON data, finds or creates users given the information, tags each person with the CMI 2017 activist code and survey response, updates this in Van's 'My Campaign' universe, and creates an CSV file displaying the information of any affected individuals. After the XML Data is initially parsed, all further steps are done simultaneously with the use of threads and multiprocessing. This program is in version 1.5.
