@@ -1,8 +1,8 @@
-#!/usr/bin/python
 """
-Copyright 2017 Sam Suri, all rights reserved. Only use with permission. Contact: samsuri100@gmail.com, (210)296-6021
+'Automated AC' Program v2.5, Copyright 2017 Sam Suri, all rights reserved. Only use with permission. 
 
-version 2
+This program uses live data from BSD and updates it in VAN's My Campaign universe. Use only after running 
+"'Automated AC' CSV Test Program," which ensures that corrupted data is not being passed into VAN. 
 """
 
 import hmac, hashlib, time, json, requests, copy
@@ -17,11 +17,11 @@ from xml.etree.ElementTree import fromstring
 
 # Declaring global constants, these are form dependant and will vary from form to form
 # These strings represent the ID of a check box, if checked, this ID is present
-SPAN_LIST = ['enter BSD check box ID(s)']
-HOUSE_LIST = ['enter BSD check box ID(s)']
-VDR_LIST = ['enter BSD check box ID(s)']
-NTL_LIST = ['enter BSD check box ID(s)']
-VOLUNTEER_LIST = ['enter BSD check box ID(s)']
+SPAN_LIST = ['4583']
+HOUSE_LIST = ['4717']
+VDR_LIST = ['4713']
+NTL_LIST = ['4716']
+VOLUNTEER_LIST = ['4713', '4715']
 
 # Integer is constant that will be referenced for loop inserting into Queue 1
 NUM_ACTIVIST_CODES = 5
@@ -32,44 +32,41 @@ def which_list():  # Returns boolean value, name of activist code to ouput to CS
     print("\nWhat List would you like to use? \n\nPlease enter: span_list, house_list, "
           "vdr_list \nntl_list, volunteer_list, or enter 'ALL'): ")
     answer = input()
-    if answer == "span_list":
-        return 0, "span_list", SPAN_LIST
-    elif answer == "house_list":
-        return 0, "house_list", HOUSE_LIST
-    elif answer == "vdr_list":
-        return 0, "vdr_list", VDR_LIST
-    elif answer == "ntl_list":
-        return 0, "ntl_list", NTL_LIST
-    elif answer == "volunteer_list":
-        return 0, "volunteer_list", VOLUNTEER_LIST
+    if answer == 'span_list':
+        return 0, 'span_list', SPAN_LIST
+    elif answer == 'house_list':
+        return 0, 'house_list', HOUSE_LIST
+    elif answer == 'vdr_list':
+        return 0, 'vdr_list', VDR_LIST
+    elif answer == 'ntl_list':
+        return 0, 'ntl_list', NTL_LIST
+    elif answer == 'volunteer_list':
+        return 0, 'volunteer_list', VOLUNTEER_LIST
     elif answer == 'ALL':  # if user chooses to have all applied, returns boolean 1 to allow Queue 1 to be populated
         return 1, '', ''
 
 # Function returns JSON data to a variable, used in second VAN API call
 def which_list_ac_sv(list_in_use):
     if list_in_use == SPAN_LIST:
-        return {"resultCodeId": None, "responses": [{"activistCodeId": ["enter code ID here"], "action": "Apply", "type": "ActivistCode"}]}
+        return {'responses': [{'activistCodeId': 4364346, 'action': 'Apply', 'type': 'ActivistCode'}]}
     elif list_in_use == HOUSE_LIST:
-        return {"resultCodeId": None, "responses": [{"activistCodeId": ["enter code ID here"], "action": "Apply", "type": "ActivistCode"}]}
+        return {'responses': [{'activistCodeId': 4364347, 'action': 'Apply', 'type': 'ActivistCode'}]}
     elif list_in_use == VDR_LIST:
-        return {"resultCodeId": None, "responses": [{"surveyQuestionId": ["enter code ID here"], "surveyResponseId":
-                ["enter survey ID here"], "type": "SurveyResponse"}]}
+        return {'responses': [{'surveyQuestionId': 244123, 'surveyResponseId': 1024452, 'type': 'SurveyResponse'}]}
     elif list_in_use == NTL_LIST:
-        return {"resultCodeId": None, "responses": [{"surveyQuestionId": ["enter code ID here"], "surveyResponseId":
-                ["enter survey ID here"], "type": "SurveyResponse"}]}
+        return {'responses': [{'surveyQuestionId': 244127, 'surveyResponseId': 1024477, 'type': 'SurveyResponse'}]}
     elif list_in_use == VOLUNTEER_LIST:
-        return {"resultCodeId": None, "responses": [{"surveyQuestionId": ["enter code ID here"], "surveyResponseId":
-                ["enter survey ID here"], "type": "SurveyResponse"}]}
+        return {'responses': [{'surveyQuestionId': 244118, 'surveyResponseId': 1024432, 'type': 'SurveyResponse'}]}
 
 #BSD Call and Declarations:
-api_secret = "[enter BSD api_secret here]"  # API secret provided by BSD for user Sam Suri
+api_secret = ''  # API secret provided by BSD for user Sam Suri
 api_ts = int(time.time())  # API call uses HMAC authentication that incorporates times
-api_id = "[enter BSD api id here]"  # API ID provided by BSD for user Sam Suri
+api_id = ''  # API ID provided by BSD for user Sam Suri
 
-api_baseCall = "/page/api/signup/get_signups_by_form_id"  # API Call to get list of signups based on form ID
-signup_form_id = str(input("Please enter the signup form ID: "))  # prompts the user for input of form ID
+api_baseCall = '/page/api/signup/get_signups_by_form_id'  # API Call to get list of signups based on form ID
+signup_form_id = str(input('Please enter the signup form ID: '))  # prompts the user for input of form ID
 # Creates paramaters for API call incorporates user ID, time created, and form ID
-api_param = "api_ver=2&api_id=" + api_id + "&api_ts=" + (str(api_ts)) + "&signup_form_id=" + str(signup_form_id)
+api_param = 'api_ver=2&api_id=' + api_id + '&api_ts=' + (str(api_ts)) + '&signup_form_id=' + str(signup_form_id)
 all_bool, name_of_list_in_use, list_in_use = which_list()  # Calls function which_list(), assigns to three variables
 
 # Creates string to pass into with HMAC authentication
@@ -77,8 +74,8 @@ signing_string = api_id + '\n' + str(api_ts) + '\n' + api_baseCall + '\n' + api_
 # Creates HMAC authentication, uses API secret 'singning_string'
 api_mac = hmac.new(api_secret.encode(), signing_string.encode(), hashlib.sha1).hexdigest()
 # Creates full address of API call, inserts API Id, time created, HMAC authentication code, and form ID
-api_url = "http://battletx.bsd.net/page/api/signup/get_signups_by_form_id?api_ver=2&api_id=" + api_id + "&api_ts=" + \
-          str(api_ts) + "&api_mac=" + api_mac + "&signup_form_id=" + str(signup_form_id)
+api_url = 'http://battletx.bsd.net/page/api/signup/get_signups_by_form_id?api_ver=2&api_id=' + api_id + '&api_ts=' + \
+          str(api_ts) + '&api_mac=' + api_mac + '&signup_form_id=' + str(signup_form_id)
 
 #Reformating BSD XML:
 api_xml_data = urllib.request.urlopen(api_url).read()  # Uses urllib library to read XML data from BSD API URL
@@ -86,9 +83,9 @@ doc = dumps(yh.data(fromstring(api_xml_data)))  # Parses XML data using xmljson 
 loaded_doc = json.loads(doc)  # Deserializes data
 
 #VAN Call and Declarations
-van_app_name = '[enter VAN id here]'  # Van User ID
+van_app_name = ''  # Van User ID
 # Van Secret, boolean number after vertical line indicates VAN universe, 1 = VAN-My Campaign, 0 = NGP
-van_secret = '[enter van secret here]'
+van_secret = ''
 van_base_url = 'https://api.securevan.com/v4'  # Base URL for API call
 van_find_url = '/people/FindOrCreate'  # first VAN API call to find or create individuals, uses POST request
 van_total_find_url = van_base_url + van_find_url  # joins base URL and first API call
@@ -132,12 +129,13 @@ def create_data_frame():
 
 # Function appends to existing dataframe, temporary dictionary is passed in
 def append_csv_row(dictionary):  # looks for keys and inserts values into data frame
-    df.loc[len(df)] = [dictionary['firstName'],
-                        dictionary['lastName'],
-                        dictionary['phones'][0]['phoneNumber'],
-                        dictionary['addresses'][0]['zipOrPostalCode'],
-                        dictionary['emails'][0]['email']
-                       ]
+    with df_append_lock:
+        df.loc[len(df)] = [dictionary['firstName'],
+                            dictionary['lastName'],
+                            dictionary['phones'][0]['phoneNumber'],
+                            dictionary['addresses'][0]['zipOrPostalCode'],
+                            dictionary['emails'][0]['email']
+                           ]
 
 # Function prints data frame to csv file whose title dynamically includes current date and AC/SV inputted by user
 def print_data_frame_to_csv(name_of_list_in_use):
@@ -148,37 +146,38 @@ def print_data_frame_to_csv(name_of_list_in_use):
 
 # Function checks to see if multiple check boxes clicked match any check box in AC/SV list and if there is a match,
 # updates both contact and AC/SV in My Campaign
-def mult_check_box_compare(mult_check_box_list, temp_dict, van_ac_sv_data, list_in_use):
+def mult_check_box_compare(mult_check_box_list, temp_dict, van_ac_sv_data, list_in_use, signup_date):
     for y in list_in_use:
         for x in mult_check_box_list:
             if x == y:
-                # calls first VAN API call, checking to see if user exists or not
-                van_post = requests.post(van_total_find_url, json=temp_dict, auth=(van_app_name, """van_secret"""))
-                for k, v in loads(van_post.text).items():  # reads response and coverts to tuple
-                    if k == 'vanId':
-                        vanid = v  # reads keys to find van ID
-                        # calls second VAN API call, updates user with appropriate AC/SV
-                        requests.post(van_total_ac_sv_url(vanid), json=van_ac_sv_data, auth=(van_app_name, """van_secret"""))
-                        append_csv_row(temp_dict)  # appends information on user to CSV file
-                        return
+                if (signup_date >= start_date) & (signup_date <= end_date):
+                    # calls first VAN API call, checking to see if user exists or not
+                    van_post = requests.post(van_total_find_url, json=temp_dict, auth=(van_app_name, van_secret))
+                    for k, v in loads(van_post.text).items():  # reads response and coverts to tuple
+                        if k == 'vanId':
+                            vanid = v  # reads keys to find van ID
+                            # calls second VAN API call, updates user with appropriate AC/SV
+                            requests.post(van_total_ac_sv_url(vanid), json=van_ac_sv_data, auth=(van_app_name, van_secret))
+                            append_csv_row(temp_dict)  # appends information on user to CSV file
+                            return
 
 # Function checks to see if the single check box clicked matches any of the code in appropriate AC/SV List
 # and if there is a match, updates both contact and AC/SV in My Campaign
-def single_check_box_compare(dictionary, temp_dict, van_ac_sv_data, list_in_use):
+def single_check_box_compare(dictionary, temp_dict, van_ac_sv_data, list_in_use, signup_date):
     for k4, v4 in dictionary.items():
         if k4 == 'signup_form_field_id':
             for y in list_in_use:
                 if v4 == y:
-                    # calls first VAN API call, checking to see if user exists or not
-                    van_post = requests.post(van_total_find_url, json=temp_dict, auth=(van_app_name, """van_secret"""))
-                    for k, v in loads(van_post.text).items():  # reads response and coverts to tuple
-                        if k == 'vanId':
-                            vanid = v   # reads keys to find van ID
-                            # calls second VAN API call, updates user with appropriate AC/SV
-                            requests.post(van_total_ac_sv_url(vanid), json=van_ac_sv_data, auth=(van_app_name, """van_secret"""))
-                            # appends information on user to CSV file
-                            append_csv_row(temp_dict)
-                            return
+                    if (signup_date >= start_date) & (signup_date <= end_date):
+                        # calls first VAN API call, checking to see if user exists or not
+                        van_post = requests.post(van_total_find_url, json=temp_dict, auth=(van_app_name, van_secret))
+                        for k, v in loads(van_post.text).items():  # reads response and coverts to tuple
+                            if k == 'vanId':
+                                vanid = v   # reads keys to find van ID
+                                # calls second VAN API call, updates user with appropriate AC/SV
+                                requests.post(van_total_ac_sv_url(vanid), json=van_ac_sv_data, auth=(van_app_name, van_secret))
+                                append_csv_row(temp_dict)  # appends information on user to CSV file
+                                return
 
 #Queue and threading variables and declarations
 q1 = Queue(maxsize = NUM_ACTIVIST_CODES)  # declares first Queue of size of all activist codes being tested for
@@ -186,6 +185,7 @@ q2 = Queue(maxsize = 2000)  # declares second Queue of maxsize 2000, max in seco
 number_of_threads_q1 = NUM_ACTIVIST_CODES  # threading equals number of AC/SV lists
 number_of_threads_q2 = 4  # threads limited to 4 due to processing constraints of current computer, could go up to 10
 queue_1_lock = threading.Lock()  # lock between each iteration in Queue 1, otherwise 12 threads will run at once
+df_append_lock = threading.Lock()  # lock ensures that all records are appended to DataFrame
 
 #function allows Queue 1 to insert the name of a list that corresponds to an activist code
 def iter_act_codes(iter_num):  # range of integers is passed in that iterates over global constant NUM_ACTIVIST_CODES
@@ -235,10 +235,12 @@ def execute_queue2(tuple):
         nested_dict = {}
         check_button = 0
         mult_check_box = 0
+        signup_date_check = 0
+        signup_date = ''
         # finds out how many fields each person has, assigns them to variables, allows program to know when to move on to next person
         temp_dict_length = indiv_dict_length(i.items())
 
-        if temp_dict_length >= 3:  # makes sure that each person at least three fields, any less and VAN cannot match user
+        if temp_dict_length >= 5:  # makes sure that each person at least three fields, any less and VAN cannot match user
             for k3, v3 in i.items():  # breaks dictionary into tuple
                 if v3 != {}:  # makes sure that only answered fields are included
                     if k3 == 'stg_signup_extra':
@@ -246,6 +248,9 @@ def execute_queue2(tuple):
                         mult_check_box = mult_check_box_copy(mult_check_box_list, v3)
                         check_button = 1  # boolean value is set to 1, means at least one check box has been clicked
                         nested_dict = v3
+                    if k3 == 'create_dt':  # finds date of when signup occurred
+                        signup_date = v3[0:10]  # strips out time
+                        signup_date_check = 1  # boolean value is set to 1, program cannot run without info
                     if k3 == 'firstname':
                         k3 = 'firstName'
                         temp_dict[k3] = v3  # if key matches, appends key, value pair to temp_dict
@@ -262,19 +267,22 @@ def execute_queue2(tuple):
                         temp_dict[k3] = v3  # if key matches, appends key, value pair to temp_dict
                     if k3 == 'phone':
                         k3 = 'phones'
-                        v3 = '1-' + v3[0:3] + '-' + v3[3:6] + '-' + v3[6:]  # reassigns value to match VAN style
+                        if v3[0] == '1':  # formats phone number to match VAN style, checks if country code is present
+                            v3 = v3[0] + '-' + v3[1:4] + '-' + v3[4:7] + '-' + v3[7:]
+                        else:
+                            v3 = '1-' + v3[0:3] + '-' + v3[3:6] + '-' + v3[6:]
                         v3 = [{'phoneNumber': v3}]  # reassigns key to match VAN JSON
                         temp_dict[k3] = v3
 
                     # makes sure that all filled out fields have been added to temp_dict, and that at least one check box has been clicked
-                    if (check_button == 1) & (len(temp_dict) == temp_dict_length):
+                    if (check_button == 1) & (signup_date_check == 1) & (len(temp_dict) == temp_dict_length):
                         if mult_check_box == 1:  # checks variable to see if multiple check boxes have been clicked
                             # allows list to be broken down into dictionaries so API calls can be made
-                            mult_check_box_compare(mult_check_box_list, temp_dict, van_ac_sv_data, list_in_use)
+                            mult_check_box_compare(mult_check_box_list, temp_dict, van_ac_sv_data, list_in_use, signup_date)
                             break
                         else:
                             # allows single dictionary to proceed so that API calls can be made
-                            single_check_box_compare(nested_dict, temp_dict, van_ac_sv_data, list_in_use)
+                            single_check_box_compare(nested_dict, temp_dict, van_ac_sv_data, list_in_use, signup_date)
                             break
         q2.task_done()
 
@@ -290,9 +298,16 @@ for i in range(number_of_threads_q2):
     worker.daemon = True
     worker.start()
 
-# MAIN BODY:
 # Creates data frame
 df = create_data_frame()
+
+# start_date and end_date variables are created from user input
+print('\nSurvey responses will only be updated if signups fall within a specific time period')
+start_date = input('Please enter the start date (YYYY-MM-DD): ')
+end_date = input('Please enter the end date (YYYY-MM-DD): ')
+
+# last point before program runs, user chooses to proceed
+input("The program will now run, please make sure all information is correct and press 'enter' to proceed: ")
 
 # Checks to see if user would like to update user information for all  activist codes/survey responses
 if all_bool == 1:
