@@ -1,7 +1,7 @@
 # Automating_All_Users Program Overview
 ## Files:
-automated_all_uses.py = Final Program <br />
-automated_all_user_csv.py = Testing Program, shows data that would be affected if final program were to run
+automating_all_uses.py = Final Program <br />
+automating_all_user_csv.py = Testing Program, shows data that would be affected if final program were to run
 
 ## Non-Technical Overview:
 This program was designed to be as simple as possible for the intended users. 
