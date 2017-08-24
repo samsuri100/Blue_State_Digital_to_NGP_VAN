@@ -1,24 +1,33 @@
 # Automating_By_Check_Box Program Overview
-The program starts out by declaring numerous variables related to BSD's API call, and VAN's API calls. These include API usernames, secrets, and various element that allow the URL to be built. In the case of BSD’s URL, It dynamically adds in a parameter, the signup form ID, which is why the program requires input. Two VAN API will be called, with both using POST requests. The second API requires a URL that has a VAN ID in it, thus there is a function that is called to dynamically add this, and this does not require user input. BSD’s API’s use HMAC authentication and VAN’s use general authentication, though it is sent via a URL that uses HTTPS encryption.
+## Files:
+automated_by_check_box.py = Final Program <br />
+automated_by_check_box_csv.py  = Testing Program, shows data that would be affected if final program were to run
 
-A PANDAS DataFrame is also created so that the program can output a log of everyone affected to a CSV file
+# Non-Technical Overview:
+This program was designed to be as simple as possible for the intended users. <br />
 
-The main part of the program begins when the BSD API is called, and XML data is then returned and read, and parsed into JSON using the yahoo standard. 
+The program will ask the users: <br />
+* Please enter the signup form ID:  <br />
+* What List would you like to use? Please enter: span_list, house_list, vdr_list, ntl_list, volunteer_list, or enter 'ALL'):  <br />
+* Please enter the start date (YYYY-MM-DD): <br />
+* Please enter the end date (YYYY-MM-DD): <br />
+* The program will now run, please make sure all information is correct and press 'enter' to proceed: <br />
+* The program has completed, press 'enter' to quit: <br />
 
-### Everything beyond this point, uses threading to run concurrently:
+To correctly run the program and match the program output, the user must enter: <br />
+* 275  <br />
+* “span_list, house_list, vdr_list, ntl_list, volunteer_list, or 'ALL'”  <br />
+* NOTE: words are case sensitive; only pick one word  <br />
+* A particular start date (ie: 2016-02-15)  <br />
+* A particular end date (ie: 2016-02-25)  <br />
+* “enter key”  <br />
+* “enter key”  <br />
 
-At this point, a previously declared queue (which is the size of the number of AC/SV lists in use) is referenced, and a global constant variable that defines the number of threads that will operate on this first queue is also referenced. There is a threading lock in place, otherwise around 20 threads will run concurrently, this this first Queue will soon reference another queue. Do not remove this, ONLY remove it if the computer being used is sufficiently powerful, such that it is 64 bit, quad-core, and each core is running at least above 2 ghz). 
+# Technical Overview:
+This program retrieves XML data from Blue State Digital, parses it, and breaks it down into a JSON dictionary that is then passed into an API call to NGP VAN. The program uses two queues (queue 1 and queue 2) and threading and will only affect users that fall within two inputted dates. This allows the program user to have greater control over the program. This program was designed to take into account check boxes, and specifically parses BSD's XML to find the status of each check box. There is also a threading lock both between each item in queue 1 and each item being appended to the DataFrame to ensure that everyone is added. For every check box, there will be a DataFrame, and each will be outputted to a CSV file. The program standardizes phone numbers so that the country code is always included.
 
-If the user inputs the word, “ALL” (it has to be in all caps), then the first queue will be populated with the parsed JSON data, a certain number of times, up until the number that is stored by the global constant variable is reached. If the user does not use the word, “ALL”, and instead inputs the name of a certain list, then the first queue will remain empty.
+All sensitive info, such as API ID's and secrets have been redacted, as they are private to Battleground Texas. The program cannot be run without this info, either from Battleground Texas or another similar organization.
 
-The resulting JSON is nested, so to get at a usable dictionary, a series of ‘for’ statements is implemented. This will result in a series of dictionaries that are in a list. The program will deal with each one by iterating through the list. 
+# Making Changes to the Program:
+To change the check box ID's, simply change the integers in the lists in lines 18 to 24. To change the activist codes and survey responses that are being applied, change the IDs and Types found in which_list_ac_sv
 
-If there are values in Queue 1, then each of these dictionaries will be outputted to a second queue. If there are no values in Queue 1, these values will still be inputted to Queue 2, but this will happen from the main body of the code, rather than within the execution function for Queue 1.
-
-In the execution function for Queue 2, a function is then called that checks to see how many fields have been filled out for each person whose key corresponds to certain text and whose value is not blank, and this number is assigned to a variable. The program also finds out if multiple checkboxes or just one box have been clicked. The program then proceeds to look for certain keys for each person (first name, last name, zip code, phone number, and email) whose value is not blank, and it adds these pairs to a temporary dictionary. Sometimes the name of the keys are changed to match the style that VAN uses (firstname becomes firstName), though the values can also change (2102966021 becomes 1-210-296-6021). This process ends when the amount of values in the temporary dictionary equal the variable returned by the previously mentioned function. This allows each user to have a different amount of fields filled out and the program can know when to iterate to the next user.
-
-The program then continues and calls one of two function. One is if multiple check boxes have been clicked and other other is if one checkbox has been clicked. It passes in the temporary dictionary to whichever function is used. Both functions call the first API, to find or create the person in VAN’s My Campaign, and then call the second API, to update their activist code and survey response status. After calling the first API, both read the response (which includes a VAN ID) and dynamically assigns this ID to correctly make the URL for the second API. They both then uses a POST request to update the activist code and survey response status of the individual. Included in the POST request is JSON data that is formatted to include the necessary activist code and survey response information. The temporary dictionary is then passed to another function that appends to the DataFrame.
-
-Once the second queue is empty, ‘q2.join()’ is satisfied and the program can read the subsequent lines, which is to print the DataFrame via a function. In this function, the DataFrame is outputted to a CSV file and then it is cleared. To clear it, a global variable that mimics a call by reference (Python may not use pointers but they still exist) is declared and this resets the value of the DataFrame to have no rows. If the user did not input “ALL”, this is irrelevant, but if they did input it, then future versions will output a DataFrame with different values to a new file for each object in Queue 1.
-
-If “ALL” was not inputted, then since q1.join() is empty, it will also be satisfied and the program will end. If the user did input “ALL” then the threading lock for that value in Queue 1 will end and it will move to the next object in Queue 1. This process will repeat until Queue 1 is empty and then q1.join() will be satisfied and the program will end. 
