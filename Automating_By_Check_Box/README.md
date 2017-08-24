@@ -29,5 +29,5 @@ This program retrieves XML data from Blue State Digital, parses it, and breaks i
 All sensitive info, such as API ID's and secrets have been redacted, as they are private to Battleground Texas. The program cannot be run without this info, either from Battleground Texas or another similar organization.
 
 # Making Changes to the Program:
-To change the check box ID's, simply change the integers in the lists in lines 18 to 24. To change the activist codes and survey responses that are being applied, change the IDs and Types found in which_list_ac_sv
+To change the check box ID's, simply change the integers in the lists in lines 18 to 24. To change the activist codes and survey responses that are being applied, change the IDs and Types found in which_list_ac_sv.
 
