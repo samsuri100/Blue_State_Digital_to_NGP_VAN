@@ -1,7 +1,7 @@
 # Automating_By_Check_Box Program Overview
 ## Files:
-automated_by_check_box.py = Final Program <br />
-automated_by_check_box_csv.py  = Testing Program, shows data that would be affected if final program were to run
+automating_by_check_box.py = Final Program <br />
+automating_by_check_box_csv.py  = Testing Program, shows data that would be affected if final program were to run
 
 # Non-Technical Overview:
 This program was designed to be as simple as possible for the intended users. <br />
